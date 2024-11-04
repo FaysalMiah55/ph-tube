@@ -14,25 +14,28 @@ const loadVideos = () => {
     .catch(error => console.log(error));
 }
 
-// {
-//     "category_id": "1001",
-//     "video_id": "aaad",
-//     "thumbnail": "https://i.ibb.co/f9FBQwz/smells.jpg",
-//     "title": "Smells Like Teen Spirit",
-//     "authors": [
-//         {
-//             "profile_picture": "https://i.ibb.co/k4tkc42/oliviar-harris.jpg",
-//             "profile_name": "Oliver Harris",
-//             "verified": true
-//         }
-//     ],
-//     "others": {
-//         "views": "5.4K",
-//         "posted_date": "1672656000"
-//     },
-//     "description": "'Smells Like Teen Spirit' by Oliver Harris captures the raw energy and rebellious spirit of youth. With over 5.4K views, this track brings a grunge rock vibe, featuring powerful guitar riffs and compelling vocals. Oliver's verified profile guarantees a quality musical journey that resonates with fans of dynamic, high-energy performances."
-// }
+//load category details 
+const loadDetails = async(video_id) => {
+    console.log(video_id);
+    const url = `https://openapi.programming-hero.com/api/phero-tube/video/${video_id}`
+    const res = await fetch(url)
+    const data = await res.json()
+    displayDetails(data.video)
 
+}
+const displayDetails = (video) => {
+    console.log(video);
+    const detailContainer = document.getElementById("modal-content")
+    detailContainer.innerHTML = `
+        <img src=${video.thumbnail} />
+        <p class="mt-2">${video.description}<p/>
+    `
+
+    // way-1
+    document.getElementById("showModalData").click()
+    // way-2
+    // document.getElementById("customModal").showModal()
+}
 // display videos
 const displayVideos = (videos) => {
     const videoContainer = document.getElementById("videos")
@@ -72,7 +75,7 @@ const displayVideos = (videos) => {
                         ${video.authors[0].verified ? '<img class="w-5" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" />' : ''}
                         
                     </div>
-                    <p></p>
+                    <p><button onclick="loadDetails('${video.video_id}')" class="btn btn-error">Details</button></p>
                 </div>
             </div>
         `
