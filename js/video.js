@@ -7,8 +7,8 @@ function getTime(time){
 }
 
 // fetch load and show the video in html
-const loadVideos = () => {
-    fetch("https://openapi.programming-hero.com/api/phero-tube/videos")
+const loadVideos = (searchText = '') => {
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos?title=${searchText}`)
     .then(res => res.json())
     .then(data => displayVideos(data.videos))
     .catch(error => console.log(error));
@@ -82,5 +82,9 @@ const displayVideos = (videos) => {
         videoContainer.append(card)
     })
 }
+
+document.getElementById("input-field").addEventListener('keyup', (e)=>{
+    loadVideos(e.target.value);
+})
 
 loadVideos()
