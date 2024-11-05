@@ -5,6 +5,16 @@ function getTime(time){
     const minute = parseInt(remainingSecond / 60)
     return `${hour}h ${minute}m ago`
 }
+// Helper function to convert views to a number (handles 'k' and 'M')
+function parseViews(viewString) {
+    if (viewString.endsWith('M')) {
+        return parseFloat(viewString) * 1_000_000;
+    } else if (viewString.endsWith('K')) {
+        return parseFloat(viewString) * 1_000;
+    } else {
+        return parseFloat(viewString);  // If the views are already numbers
+    }
+}
 
 // fetch load and show the video in html
 const loadVideos = (searchText = '') => {
@@ -72,10 +82,12 @@ const displayVideos = (videos) => {
                     <h3 class="text-[16px] font-bold"> ${video.title} </h3>
                     <div class="flex gap-2 items-center">
                         <p class="text-[#171717B3] text-sm">${video.authors[0].profile_name} </p>
-                        ${video.authors[0].verified ? '<img class="w-5" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" />' : ''}
-                        
+                        ${video.authors[0].verified ? '<img class="w-5" src="https://img.icons8.com/?size=48&id=D9RtvkuOe31p&format=png" />' : ''}                       
                     </div>
-                    <p><button onclick="loadDetails('${video.video_id}')" class="btn btn-error">Details</button></p>
+                    <div class="flex gap-10 justify-between items-center text-xs text-[#171717B3] mt-1">
+                        <p>${video.others.views} views</p>
+                        <p><button onclick="loadDetails('${video.video_id}')" class="underline">Details</button><p>
+                    </div>
                 </div>
             </div>
         `
@@ -83,6 +95,24 @@ const displayVideos = (videos) => {
     })
 }
 
+// sort video
+document.getElementById("sort-items").addEventListener('click', ()=>{
+    fetch(`https://openapi.programming-hero.com/api/phero-tube/videos`)
+    .then(res => res.json())
+    .then(data => {
+        // Sort the videos array by views
+        const sortedVideos = data.videos.sort((a, b) => {
+            const viewsA = parseViews(a.others.views);
+            const viewsB = parseViews(b.others.views);
+            return viewsB - viewsA; // Sort in descending order (highest views first)
+        });
+        // Display the sorted videos
+        displayVideos(sortedVideos);
+    })
+    .catch(error => console.log(error));
+})
+
+// filter in search
 document.getElementById("input-field").addEventListener('keyup', (e)=>{
     loadVideos(e.target.value);
 })
